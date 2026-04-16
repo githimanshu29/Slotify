@@ -1,19 +1,15 @@
 // ─────────────────────────────────────────────────────────────
 //  Seed Script — Populates the database with initial data
 //
-//  Seeds 3 services + availability templates for each
-//  This is what an admin would do via the admin panel,
-//  but we automate it for easy setup and testing
+//  Seeds:
+//    1. Default admin user (for testing admin routes)
+//    2. Default test user (for testing chat)
+//    3. 3 services + availability templates
 //
 //  Run: node src/scripts/seed.js
 //
 //  Idempotent: clears existing data and re-seeds
 //  (safe to run multiple times)
-//
-//  After seeding, the chatbot can handle:
-//    "Book dentist tomorrow at 10am"
-//    "Schedule a massage for next Monday"
-//    "I need a physio appointment"
 // ─────────────────────────────────────────────────────────────
 
 import dotenv from 'dotenv';
@@ -23,6 +19,7 @@ import mongoose from 'mongoose';
 import connectDB from '../config/db.js';
 import Service from '../models/Service.js';
 import AvailabilityTemplate from '../models/AvailabilityTemplate.js';
+import User from '../models/User.js';
 
 // ── Service definitions ──
 const services = [
@@ -44,7 +41,6 @@ const services = [
 ];
 
 // ── Availability: Monday(1) through Friday(5) ──
-// Each service is available on weekdays with different hours
 const schedules = {
   Dentist: {
     days: [1, 2, 3, 4, 5], // Mon-Fri
@@ -74,11 +70,31 @@ async function seed() {
     // ── Clear existing data ──
     await Service.deleteMany({});
     await AvailabilityTemplate.deleteMany({});
-    console.log('✓ Cleared existing services and templates');
+    await User.deleteMany({});
+    console.log('✓ Cleared existing services, templates, and users');
+
+    // ── Create default users ──
+    const adminUser = await User.create({
+      name: 'Admin',
+      email: 'admin@slotify.com',
+      password: 'admin123',
+      role: 'admin',
+    });
+
+    const testUser = await User.create({
+      name: 'Test User',
+      email: 'test@slotify.com',
+      password: 'test123',
+      role: 'user',
+    });
+
+    console.log('✓ Created default users:');
+    console.log(`  • Admin: admin@slotify.com / admin123 (role: ${adminUser.role})`);
+    console.log(`  • User:  test@slotify.com / test123 (role: ${testUser.role})`);
 
     // ── Create services ──
     const createdServices = await Service.insertMany(services);
-    console.log(`✓ Created ${createdServices.length} services:`);
+    console.log(`\n✓ Created ${createdServices.length} services:`);
     createdServices.forEach((s) => console.log(`  • ${s.name} (${s.duration}min slots)`));
 
     // ── Create availability templates ──
@@ -112,7 +128,11 @@ async function seed() {
     }
 
     console.log('\n✅ Seed complete! Database is ready.\n');
-    console.log('You can now start the server with: npm run dev\n');
+    console.log('Quick start:');
+    console.log('  1. npm run dev');
+    console.log('  2. POST /api/auth/login with { email: "test@slotify.com", password: "test123" }');
+    console.log('  3. Use the accessToken in Authorization: Bearer <token>');
+    console.log('  4. POST /api/chat with { message: "Book dentist tomorrow at 10am" }\n');
   } catch (error) {
     console.error('❌ Seed failed:', error.message);
   } finally {

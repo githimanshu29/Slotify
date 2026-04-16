@@ -1,5 +1,10 @@
 node_modules/
 
+server/node_modules/
+client/node_modules/
+
+walkthrough.md
+postman_testing_guide.md
 .env
 dist/
 build/  

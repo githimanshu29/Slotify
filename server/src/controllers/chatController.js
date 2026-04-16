@@ -2,14 +2,17 @@
 //  Chat Controller
 //  The main pipeline: message in → LLM extract → merge → decide → respond
 //
-//  This is the HTTP handler for POST /api/chat
-//  It orchestrates Steps 3-8 of the system design:
+//  With JWT auth:
+//    - req.user is set by authMiddleware (contains userId, email)
+//    - sessionId defaults to `user_${userId}` if not provided
+//    - Sessions are scoped to the authenticated user
 //
-//  Step 3: extractIntent(message, history) → structured JSON
-//  Step 4: mergeState(state, extracted) → updated state
-//  Step 5: handleIntent(state) → decision engine
-//  Step 6-7: (called internally by decision engine)
-//  Step 8: saveSession + return response
+//  Pipeline (Steps 3-8 of system design):
+//    Step 3: extractIntent(message, history) → structured JSON
+//    Step 4: mergeState(state, extracted) → updated state
+//    Step 5: handleIntent(state) → decision engine
+//    Step 6-7: (called internally by decision engine)
+//    Step 8: saveSession + return response
 //
 //  The controller does NOT contain business logic.
 //  It's just plumbing — connecting services together.
@@ -24,21 +27,30 @@ import logger from '../utils/Logger.js';
 /**
  * Handle incoming chat message
  * POST /api/chat
- * Body: { sessionId: string, message: string }
+ * Header: Authorization: Bearer <accessToken>
+ * Body: { message: string, sessionId?: string }
+ *
+ * sessionId is optional — defaults to `user_${userId}`
+ * This means each user gets one conversation by default,
+ * or they can maintain multiple by sending different sessionIds
  */
 export async function handleMessage(req, res) {
   try {
-    const { sessionId, message } = req.body;
+    const { message, sessionId: clientSessionId } = req.body;
+    const { userId, email } = req.user;
 
     // ── Validate input ──
-    if (!sessionId || !message) {
-      return sendError(res, 'sessionId and message are required', 400);
+    if (!message) {
+      return sendError(res, 'message is required', 400);
     }
 
-    logger.info('Chat message received', { sessionId, message });
+    // ── Derive sessionId from user if not provided ──
+    const sessionId = clientSessionId || `user_${userId}`;
+
+    logger.info('Chat message received', { sessionId, userId, message });
 
     // ── Step 1: Load session state from DB ──
-    const { state, history } = await loadSession(sessionId);
+    const { state, history } = await loadSession(sessionId, userId);
 
     // ── Step 3: Extract intent + entities via LLM ──
     const extracted = await extractIntent(message, history);
@@ -57,7 +69,7 @@ export async function handleMessage(req, res) {
       { role: 'assistant', content: result.reply },
     ];
 
-    await saveSession(sessionId, result.state, updatedHistory);
+    await saveSession(sessionId, userId, result.state, updatedHistory);
 
     // ── Return response ──
     const response = { reply: result.reply };

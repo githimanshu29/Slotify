@@ -1,21 +1,19 @@
 // ─────────────────────────────────────────────────────────────
 //  Admin Routes
-//  All routes protected by adminAuth middleware
-//  Header required: x-admin-key: <ADMIN_KEY from .env>
+//  Double-protected: authMiddleware (JWT) + adminAuth (API key)
+//
+//  Both layers required:
+//    1. Authorization: Bearer <accessToken>  → proves identity
+//    2. x-admin-key: <ADMIN_KEY>             → proves admin access
 //
 //  Three resource groups:
 //    /api/admin/appointments  — view + cancel bookings
 //    /api/admin/services      — CRUD for service types
 //    /api/admin/availability  — weekly schedule configuration
-//
-//  Step 8 of system design:
-//    GET  /api/admin/appointments     → paginated list
-//    GET  /api/admin/appointments/:id → single appointment
-//    PATCH /api/admin/appointments/:id → cancel appointment
-//    + services and availability CRUD
 // ─────────────────────────────────────────────────────────────
 
 import { Router } from 'express';
+import { authMiddleware } from '../middleware/authMiddleware.js';
 import { adminAuth } from '../middleware/adminAuth.js';
 import {
   getAppointments,
@@ -33,7 +31,8 @@ import {
 
 const router = Router();
 
-// ── All admin routes require the x-admin-key header ──
+// ── All admin routes require JWT + admin key ──
+router.use(authMiddleware);
 router.use(adminAuth);
 
 // ── Appointments ──

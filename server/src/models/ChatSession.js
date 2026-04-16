@@ -2,15 +2,13 @@
 //  ChatSession Model
 //  Persists conversation state across multiple turns
 //
-//  Why this exists: The booking flow is multi-turn:
-//    Turn 1: "Book dentist tomorrow" → service + date filled
-//    Turn 2: "6pm"                   → time filled
-//    Turn 3: "John"                  → name filled
-//    Turn 4: "john@email.com"        → email filled
-//    Turn 5: "yes"                   → CONFIRM → create booking
+//  With JWT auth, sessions are now linked to authenticated users:
+//    sessionId = `user_${userId}` (default, one session per user)
+//    OR sessionId = custom ID for multiple conversations
 //
-//  Without persistent state, every turn would start fresh
-//  and the user would have to repeat everything.
+//  The userId field enables:
+//    - Querying all sessions for a user
+//    - Preventing session hijacking (user can only access their own)
 //
 //  State is saved via upsert (Step 8 of system design):
 //    await ChatSession.findOneAndUpdate(
@@ -27,8 +25,16 @@ const chatSessionSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    // Client generates this (UUID) and sends it with every request
+    // With auth: defaults to `user_${userId}`
     // This ties multiple HTTP requests to one conversation
+  },
+
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    // Links session to authenticated user
+    // Prevents cross-user session access
   },
 
   state: {
@@ -65,6 +71,9 @@ const chatSessionSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+// Index for fast user session lookups
+chatSessionSchema.index({ userId: 1 });
 
 const ChatSession = mongoose.model('ChatSession', chatSessionSchema);
 export default ChatSession;

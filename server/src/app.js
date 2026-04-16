@@ -13,6 +13,11 @@
 //    4. request logger
 //    5. routes
 //    6. error handler (MUST be last)
+//
+//  Auth architecture:
+//    /api/auth/*  → public (register, login, refresh) + protected (logout, me)
+//    /api/chat    → protected by authMiddleware (JWT required)
+//    /api/admin/* → protected by authMiddleware + adminAuth (JWT + admin key)
 // ─────────────────────────────────────────────────────────────
 
 import express from 'express';
@@ -24,6 +29,7 @@ import requestLogger from './middleware/requestLogger.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 // Routes
+import authRoutes from './routes/authRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 
@@ -44,13 +50,15 @@ app.get('/', (_req, res) => {
     message: 'Slotify API running 🚀',
     version: '1.0.0',
     endpoints: {
-      chat: 'POST /api/chat',
-      admin: '/api/admin/* (requires x-admin-key header)',
+      auth: '/api/auth/* (register, login, refresh, logout, me)',
+      chat: 'POST /api/chat (JWT required)',
+      admin: '/api/admin/* (JWT + x-admin-key required)',
     },
   });
 });
 
 // ── Mount routes ──
+app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
 

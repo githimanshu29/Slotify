@@ -2,12 +2,10 @@
 //  Session Service
 //  Load, save, merge state, and manage conversation history
 //
-//  This is the glue between the DB (ChatSession model) and
-//  the decision engine. Every chat request:
-//    1. loadSession(sessionId)  → get current state
-//    2. mergeState(state, extracted)  → update with LLM output
-//    3. ... decision engine runs ...
-//    4. saveSession(sessionId, state, history)  → persist
+//  With JWT auth, sessions are tied to authenticated users:
+//    - sessionId defaults to `user_${userId}` if not provided
+//    - userId is stored on the session for ownership validation
+//    - Users can only access their own sessions
 //
 //  mergeState (Step 4 of system design) is a PURE FUNCTION:
 //    - No AI involved
@@ -43,21 +41,22 @@ export function emptyState() {
 /**
  * Load session from DB, or create a fresh one
  *
- * @param {string} sessionId - Client-generated UUID
+ * @param {string} sessionId - Session identifier
+ * @param {string} userId - Authenticated user's ID
  * @returns {{ state: object, history: Array }}
  */
-export async function loadSession(sessionId) {
-  const session = await ChatSession.findOne({ sessionId });
+export async function loadSession(sessionId, userId) {
+  const session = await ChatSession.findOne({ sessionId, userId });
 
   if (session) {
-    logger.debug('Session loaded', { sessionId });
+    logger.debug('Session loaded', { sessionId, userId });
     return {
       state: session.state || emptyState(),
       history: session.history || [],
     };
   }
 
-  logger.debug('New session created', { sessionId });
+  logger.debug('New session created', { sessionId, userId });
   return {
     state: emptyState(),
     history: [],
@@ -66,21 +65,17 @@ export async function loadSession(sessionId) {
 
 /**
  * Save session state + history back to DB (upsert)
- * Step 8 of system design:
- *   await ChatSession.findOneAndUpdate(
- *     { sessionId },
- *     { state, updatedAt: new Date() },
- *     { upsert: true, new: true }
- *   );
  *
  * @param {string} sessionId
+ * @param {string} userId - Authenticated user's ID
  * @param {object} state - Current conversation state
  * @param {Array} history - Conversation history array
  */
-export async function saveSession(sessionId, state, history) {
+export async function saveSession(sessionId, userId, state, history) {
   await ChatSession.findOneAndUpdate(
     { sessionId },
     {
+      userId,
       state,
       history: history.slice(-6), // Keep only last 6 entries (3 turns)
       updatedAt: new Date(),
@@ -88,7 +83,7 @@ export async function saveSession(sessionId, state, history) {
     { upsert: true, new: true }
   );
 
-  logger.debug('Session saved', { sessionId });
+  logger.debug('Session saved', { sessionId, userId });
 }
 
 /**
@@ -103,13 +98,6 @@ export async function saveSession(sessionId, state, history) {
  * @param {object} state - Current conversation state
  * @param {object} extracted - LLM output from intentExtractor
  * @returns {object} Updated state (mutates in place for simplicity)
- *
- * Example:
- *   state.collectedInfo = { service:"dentist", date:"2026-04-16", time:null, ... }
- *   extracted = { intent:"BOOK", service:null, date:null, time:"18:00", ... }
- *   After merge:
- *   state = { intent:"BOOK", collectedInfo: { service:"dentist", date:"2026-04-16", time:"18:00", ... } }
- *   ↑ service and date PRESERVED, time ADDED
  */
 export function mergeState(state, extracted) {
   // Intent always updated
