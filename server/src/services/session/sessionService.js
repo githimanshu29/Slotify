@@ -1,19 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Session Service
-//  Load, save, merge state, and manage conversation history
-//
-//  With JWT auth, sessions are tied to authenticated users:
-//    - sessionId defaults to `user_${userId}` if not provided
-//    - userId is stored on the session for ownership validation
-//    - Users can only access their own sessions
-//
-//  mergeState (Step 4 of system design) is a PURE FUNCTION:
-//    - No AI involved
-//    - Only non-null fields from LLM overwrite existing values
-//    - This is how multi-turn works:
-//        Turn 1: "book dentist tomorrow" → service + date filled
-//        Turn 2: "6pm" → time filled (service + date preserved!)
-// ─────────────────────────────────────────────────────────────
+
 
 import ChatSession from '../../models/ChatSession.js';
 import logger from '../../utils/Logger.js';
@@ -106,10 +91,10 @@ export function mergeState(state, extracted) {
   // Only overwrite fields that LLM actually found
   const info = state.collectedInfo;
   if (extracted.service !== null) info.service = extracted.service;
-  if (extracted.date !== null)    info.date = extracted.date;
-  if (extracted.time !== null)    info.time = extracted.time;
-  if (extracted.name !== null)    info.name = extracted.name;
-  if (extracted.email !== null)   info.email = extracted.email;
+  if (extracted.date !== null) info.date = extracted.date;
+  if (extracted.time !== null) info.time = extracted.time;
+  if (extracted.name !== null) info.name = extracted.name;
+  if (extracted.email !== null) info.email = extracted.email;
   if (extracted.refCode !== null) info.refCode = extracted.refCode;
 
   return state;

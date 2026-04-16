@@ -1,37 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Decision Engine — THE REAL BRAIN (Step 5 of system design)
-//
-//  Pure deterministic code — NO AI involved.
-//  The engine checks completeness of collectedInfo and decides
-//  the next action. It either:
-//    - Asks a follow-up question (missing field)
-//    - Checks availability (all fields ready)
-//    - Creates a booking (user confirmed)
-//    - Lists bookings or cancels
-//    - Handles chitchat
-//
-//  Every path is testable and predictable.
-//
-//  Why this exists as a separate file:
-//    Controllers should NOT contain business logic.
-//    The LLM should NOT make decisions.
-//    This engine is the SINGLE place where "what happens next"
-//    is determined. If you want to understand the system flow,
-//    read THIS file.
-//
-//  Flow (from Step 5 of system design):
-//    IF CHITCHAT → respond
-//    IF LIST → require email → list bookings
-//    IF CANCEL → require email + refCode → cancel
-//    IF BOOK or CONFIRM:
-//      Missing service? → ask
-//      Missing date? → ask
-//      Missing time? → ask
-//      Missing name? → ask
-//      Missing email? → ask
-//      All present + BOOK → checkAvailability
-//      All present + CONFIRM + selectedSlot → createBooking
-// ─────────────────────────────────────────────────────────────
+
 
 import { checkAvailability } from '../services/booking/availabilityService.js';
 import { createBooking, cancelBooking, listBookings } from '../services/booking/bookingService.js';

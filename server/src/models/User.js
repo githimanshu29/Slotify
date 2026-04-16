@@ -1,20 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  User Model
-//  Stores registered users with hashed passwords
-//
-//  Auth flow:
-//    Register → hash password → save user
-//    Login → compare password → issue access + refresh tokens
-//    Refresh → verify refresh token → issue new pair
-//    Logout → clear refresh token from DB
-//
-//  The refreshToken is stored in DB so we can:
-//    1. Invalidate it on logout (set to null)
-//    2. Detect token reuse (stolen refresh tokens)
-//
-//  Role field enables future admin-via-JWT if needed,
-//  but currently admin uses x-admin-key for simplicity
-// ─────────────────────────────────────────────────────────────
+
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';

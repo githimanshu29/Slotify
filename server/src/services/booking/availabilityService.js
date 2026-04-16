@@ -1,28 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Availability Service — Step 6 of system design
-//  Resolves service names, validates requested slots,
-//  and builds confirmation prompts
-//
-//  This is where the chatbot meets the database:
-//    1. User said "dentist" → find the Service doc
-//    2. User said "2026-04-16" → get that day's template
-//    3. Generate all possible slots for that day
-//    4. Remove already-booked slots
-//    5. Check if user's requested time is available
-//    6. If yes → "Confirm? (yes/no)"
-//    7. If no → "Try 17:30 or 18:30 instead?"
-//
-//  WHY we need predefined services + templates:
-//    When user says "book dentist", we do:
-//      Service.findOne({ name: /dentist/i })
-//    This returns the actual service document with _id.
-//    Without it, we'd have no way to:
-//      - Know what services exist
-//      - Look up availability templates
-//      - Create appointment records (they reference serviceId)
-//    The admin creates services + templates FIRST,
-//    THEN users can book them via chatbot.
-// ─────────────────────────────────────────────────────────────
+
 
 import Service from '../../models/Service.js';
 import AvailabilityTemplate from '../../models/AvailabilityTemplate.js';

@@ -1,26 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Intent Extractor — THE most critical LLM file
-//  (Step 3 of system design)
-//
-//  The LLM's ONLY job: parse natural language into structured JSON
-//  It does NOT decide anything. It does NOT write to DB.
-//  It resolves "tomorrow" to a date, "evening" to a time — that's it.
-//  Output is validated before use.
-//
-//  System prompt design choices:
-//    1. "Return ONLY valid JSON" — prevents prose/explanations
-//    2. Explicit intent list — no ambiguity about categories
-//    3. "Use null for missing fields" — critical for mergeState
-//       Without null, LLM might guess values → bad bookings
-//    4. Relative date resolution — "tomorrow" → ISO date
-//    5. Schema provided inline — LLM knows exact output shape
-//
-//  Prompt injection defense:
-//    - Strict role: "You are an intent extractor"
-//    - "Return ONLY valid JSON" leaves no room for other output
-//    - Zod schema validation catches any malformed responses
-//    - Fallback to CHITCHAT on parse failure
-// ─────────────────────────────────────────────────────────────
+
 
 import { z } from 'zod';
 import { getGroqClient } from './groqClient.js';

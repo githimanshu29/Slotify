@@ -1,7 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Consistent API response wrappers
-//  Every controller uses these — no ad-hoc response shapes
-// ─────────────────────────────────────────────────────────────
+
 
 /**
  * Send a success response

@@ -1,22 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  ChatSession Model
-//  Persists conversation state across multiple turns
-//
-//  With JWT auth, sessions are now linked to authenticated users:
-//    sessionId = `user_${userId}` (default, one session per user)
-//    OR sessionId = custom ID for multiple conversations
-//
-//  The userId field enables:
-//    - Querying all sessions for a user
-//    - Preventing session hijacking (user can only access their own)
-//
-//  State is saved via upsert (Step 8 of system design):
-//    await ChatSession.findOneAndUpdate(
-//      { sessionId },
-//      { state, updatedAt: new Date() },
-//      { upsert: true, new: true }
-//    );
-// ─────────────────────────────────────────────────────────────
+
 
 import mongoose from 'mongoose';
 

@@ -1,14 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Service Model
-//  Represents what the business offers: Dentist, Massage, etc.
-//  Admin creates these → chatbot references them during booking
-//
-//  Why this exists: When a user says "book dentist", the system
-//  does Service.findOne({ name: /dentist/i }) to resolve the
-//  service name from natural language to a real DB record.
-//  Without predefined services, we'd have no idea what "dentist"
-//  maps to — no duration, no availability templates, nothing.
-// ─────────────────────────────────────────────────────────────
+
 
 import mongoose from 'mongoose';
 

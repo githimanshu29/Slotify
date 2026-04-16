@@ -1,16 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-//  Seed Script — Populates the database with initial data
-//
-//  Seeds:
-//    1. Default admin user (for testing admin routes)
-//    2. Default test user (for testing chat)
-//    3. 3 services + availability templates
-//
-//  Run: node src/scripts/seed.js
-//
-//  Idempotent: clears existing data and re-seeds
-//  (safe to run multiple times)
-// ─────────────────────────────────────────────────────────────
 
 import dotenv from 'dotenv';
 dotenv.config();

@@ -1,10 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Date utility functions
-//  Used by availability checks (DB range queries) and
-//  response formatting (human-readable dates/times)
-//
-//  Install note: dayjs plugins are bundled — no extra installs
-// ─────────────────────────────────────────────────────────────
+
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';

@@ -1,16 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Server Entry Point
-//  Connects to MongoDB → starts the HTTP server
-//
-//  Separation of concerns:
-//    src/app.js   → Express configuration (middleware, routes)
-//    server.js    → Runtime (DB connection, port binding, shutdown)
-//
-//  This file does 3 things:
-//    1. Load environment variables
-//    2. Connect to MongoDB
-//    3. Start listening on PORT
-// ─────────────────────────────────────────────────────────────
+
 
 import dotenv from 'dotenv';
 dotenv.config();

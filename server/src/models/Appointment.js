@@ -1,16 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Appointment Model
-//  The core booking record — created when user confirms a slot
-//
-//  Lifecycle:
-//    1. User says "yes" → intent=CONFIRM
-//    2. decisionEngine calls createBooking()
-//    3. Appointment.create({ ... status: 'CONFIRMED' })
-//    4. User gets refCode like "APT-7K3X"
-//
-//  The refCode is what the user uses to cancel:
-//    "Cancel APT-7K3X" → intent=CANCEL, refCode extracted
-// ─────────────────────────────────────────────────────────────
+
 
 import mongoose from 'mongoose';
 

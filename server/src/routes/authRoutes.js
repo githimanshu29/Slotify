@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-//  Auth Routes
-//  Public routes: register, login, refresh
-//  Protected routes: logout, me (require valid access token)
-// ─────────────────────────────────────────────────────────────
 
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/authMiddleware.js';

@@ -1,22 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Auth Controller
-//  Handles user registration, login, token refresh, and logout
-//
-//  Token strategy:
-//    Access Token  → short-lived (15 min), used for API calls
-//    Refresh Token → long-lived (7 days), used to get new access tokens
-//
-//  Why two tokens?
-//    - If access token is stolen, damage is limited (15 min window)
-//    - Refresh token is stored in DB, so we can invalidate it on logout
-//    - Better UX: user stays logged in for 7 days without re-entering password
-//
-//  Flow:
-//    Register → hash password → save user → issue tokens
-//    Login    → verify password → issue tokens
-//    Refresh  → verify refresh token → issue new pair
-//    Logout   → clear refresh token from DB
-// ─────────────────────────────────────────────────────────────
+
 
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';

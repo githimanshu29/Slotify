@@ -1,16 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Admin Routes
-//  Double-protected: authMiddleware (JWT) + adminAuth (API key)
-//
-//  Both layers required:
-//    1. Authorization: Bearer <accessToken>  → proves identity
-//    2. x-admin-key: <ADMIN_KEY>             → proves admin access
-//
-//  Three resource groups:
-//    /api/admin/appointments  — view + cancel bookings
-//    /api/admin/services      — CRUD for service types
-//    /api/admin/availability  — weekly schedule configuration
-// ─────────────────────────────────────────────────────────────
+
 
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/authMiddleware.js';

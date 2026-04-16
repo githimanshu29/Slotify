@@ -1,22 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Chat Controller
-//  The main pipeline: message in → LLM extract → merge → decide → respond
-//
-//  With JWT auth:
-//    - req.user is set by authMiddleware (contains userId, email)
-//    - sessionId defaults to `user_${userId}` if not provided
-//    - Sessions are scoped to the authenticated user
-//
-//  Pipeline (Steps 3-8 of system design):
-//    Step 3: extractIntent(message, history) → structured JSON
-//    Step 4: mergeState(state, extracted) → updated state
-//    Step 5: handleIntent(state) → decision engine
-//    Step 6-7: (called internally by decision engine)
-//    Step 8: saveSession + return response
-//
-//  The controller does NOT contain business logic.
-//  It's just plumbing — connecting services together.
-// ─────────────────────────────────────────────────────────────
+
 
 import { extractIntent } from '../services/llm/intentExtractor.js';
 import { loadSession, saveSession, mergeState } from '../services/session/sessionService.js';

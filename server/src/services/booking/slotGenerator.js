@@ -1,19 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Slot Generator
-//  Computes available time slots from an AvailabilityTemplate,
-//  filtering out already-booked ones
-//
-//  Example:
-//    template = { startTime: "10:00", endTime: "18:00", slotDuration: 30 }
-//    generateSlots(template) → ["10:00","10:30","11:00",...,"17:30"]
-//
-//    Note: last slot is 17:30 (not 18:00) because 18:00 would mean
-//    the appointment runs until 18:30, past closing time
-//
-//  Why this is separate from availabilityService:
-//    - Single responsibility: this file only does time math
-//    - Easy to unit test without DB dependencies
-// ─────────────────────────────────────────────────────────────
+
 
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';

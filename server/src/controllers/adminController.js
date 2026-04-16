@@ -1,21 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Admin Controller
-//  Full CRUD for managing the booking system backend
-//
-//  Three resource groups:
-//    1. Appointments — view, filter, cancel bookings
-//    2. Services — CRUD for what the business offers
-//    3. Availability — configure weekly schedules per service
-//
-//  All routes require x-admin-key header (adminAuth middleware)
-//
-//  Why admin exists:
-//    "Admin defines WHAT can be booked, User decides WHEN to book"
-//    Without admin routes, there's no way to:
-//      - Add new services (Dentist, Massage, etc.)
-//      - Set working hours for each service
-//      - View or cancel problematic bookings
-// ─────────────────────────────────────────────────────────────
+
 
 import Appointment from '../models/Appointment.js';
 import Service from '../models/Service.js';

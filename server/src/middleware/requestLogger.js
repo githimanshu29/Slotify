@@ -1,7 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Request Logger Middleware
-//  Morgan HTTP logger piped through Winston for unified logging
-// ─────────────────────────────────────────────────────────────
+
 
 import morgan from 'morgan';
 import logger from '../utils/Logger.js';

@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Global Error Handler Middleware
-//  Catches all thrown/next(err) errors and returns consistent
-//  JSON error responses. This is the LAST middleware in the chain.
-// ─────────────────────────────────────────────────────────────
+
 
 import logger from '../utils/Logger.js';
 import { sendError } from '../utils/responseUtils.js';

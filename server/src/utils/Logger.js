@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Winston Logger — structured logging with env-aware transports
-//  Dev  → colorized, human-readable console output
-//  Prod → JSON format for log aggregation
-// ─────────────────────────────────────────────────────────────
+
 
 import winston from 'winston';
 

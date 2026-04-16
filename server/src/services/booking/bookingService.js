@@ -1,13 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Booking Service — Step 7 of system design
-//  Creates, cancels, and lists appointments
-//  ALL database writes for appointments live here
-//
-//  This is the final step in the booking flow:
-//    User confirmed → decisionEngine calls createBooking(state)
-//    → duplicate check → Appointment.create() → refCode returned
-//    → state reset for next booking
-// ─────────────────────────────────────────────────────────────
+
 
 import Appointment from '../../models/Appointment.js';
 import { generateRefCode } from '../../utils/refCodeGenerator.js';

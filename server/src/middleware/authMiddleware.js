@@ -1,19 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-//  Auth Middleware — JWT Access Token Verification
-//
-//  Protects routes that require a logged-in user.
-//  Extracts the access token from Authorization header,
-//  verifies it, and attaches user info to req.user.
-//
-//  Header format: Authorization: Bearer <accessToken>
-//
-//  On success: req.user = { userId, email, role }
-//  On failure: 401 Unauthorized
-//
-//  Used on:
-//    - /api/chat (user must be logged in to chat)
-//    - /api/admin (combined with adminAuth for double protection)
-// ─────────────────────────────────────────────────────────────
+
 
 import jwt from 'jsonwebtoken';
 import { sendError } from '../utils/responseUtils.js';
