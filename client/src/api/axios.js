@@ -1,19 +1,36 @@
 import axios from 'axios';
 
+const getBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) return '/api';
+  // If the deployed URL from Vercel/Railway doesn't include /api, attach it
+  const url = envUrl.replace(/\/$/, ""); // remove trailing slash
+  return url.endsWith('/api') ? url : `${url}/api`;
+};
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: getBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
 });
 
 // ── Request interceptor: attach access token to every request ──
 API.interceptors.request.use(
   (config) => {
+    // 1. Manually combine baseURL and url to prevent Axios URL resolution anomalies
+    if (config.baseURL && config.url) {
+      const base = config.baseURL.replace(/\/+$/, '');
+      const path = config.url.replace(/^\/+/, '');
+      config.url = `${base}/${path}`;
+      config.baseURL = ''; // Clear baseURL so axios doesn't combine it again
+    }
+
+    // 2. Attach tokens
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     // Attach admin key for admin routes
-    if (config.url?.startsWith('/admin')) {
+    if (config.url?.includes('/admin')) {
       const adminKey = localStorage.getItem('adminKey');
       if (adminKey) {
         config.headers['x-admin-key'] = adminKey;
@@ -24,7 +41,7 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ── Response interceptor: auto-refresh on 401 ──
+// ── Response interceptor: auto-refresh on 401 ── 
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -64,7 +81,8 @@ API.interceptors.response.use(
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) throw new Error('No refresh token');
 
-        const { data } = await axios.post(`${import.meta.env.VITE_API_URL || '/api'}/auth/refresh`, { refreshToken });
+        const refreshUrl = `${getBaseUrl()}/auth/refresh`;
+        const { data } = await axios.post(refreshUrl, { refreshToken });
 
         const newAccessToken = data.data.accessToken;
         const newRefreshToken = data.data.refreshToken;
