@@ -106,8 +106,8 @@ The system uses a strictly typed prompt design. Instead of asking the LLM to gen
 
 We utilized AI coding assistants heavily to accelerate the development of standard boilerplate, UI scaffolding, and complex state management.
 
-*   **Models Used:** Code was primarily generated and reviewed using **Claude 3.5 Sonnet** and **Claude 3 Opus** (via Google DeepMind's Antigravity agentic framework).
-*   **Reasoning:** Claude 3.5 Sonnet excels at writing React components and Tailwind CSS quickly, while Opus is highly capable at reviewing complex architectural flows (like the 8-step Decision Engine pipeline) and ensuring MongoDB relations are correctly enforced.
+*   **Models Used:** Code was primarily generated and reviewed using **Claude 4.6 Sonnet** and **Claude 4.6 Opus** (via Google DeepMind's Antigravity agentic framework).
+*   **Reasoning:** Claude 4.6 Sonnet excels at writing React components and Tailwind CSS quickly, while Opus is highly capable at reviewing complex architectural flows (like the 8-step Decision Engine pipeline) and ensuring MongoDB relations are correctly enforced.
 *   **How it was used:** 
     *   *UI Generation:* Generating the Chat UI with typing indicators and sliding animations.
     *   *Refactoring:* Diagnosing a Tailwind v4 compilation error and seamlessly downgrading the React app to Tailwind v3 with PostCSS configuration.
