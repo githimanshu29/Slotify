@@ -264,7 +264,7 @@ function AppointmentsTab() {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState('');
 
-  const fetch = async () => { setLoading(true); try { const p = { page, limit: 10 }; if (filter) p.status = filter; const { data } = await API.get('/admin/appointments', { params: p }); setAppointments(data.data || []); } catch (e) {} finally { setLoading(false); } };
+  const fetch = async () => { setLoading(true); try { const p = { page, limit: 10 }; if (filter) p.status = filter; const { data } = await API.get('/admin/appointments', { params: p }); setAppointments(data.data?.appointments || []); } catch (e) {} finally { setLoading(false); } };
   useEffect(() => { fetch(); }, [page, filter]);
 
   const handleCancel = async (id) => { if (!confirm('Cancel?')) return; try { await API.patch(`/admin/appointments/${id}`, { status: 'CANCELLED' }); fetch(); } catch (e) { alert('Failed'); } };
@@ -296,8 +296,8 @@ function AppointmentsTab() {
                   <tr key={a._id} className="hover:bg-gray-800/30 transition-colors">
                     <td className="px-4 py-3.5 text-sm font-mono text-purple-400">{a.refCode}</td>
                     <td className="px-4 py-3.5 text-sm text-slate-100">{a.serviceName || a.serviceId?.name || '—'}</td>
-                    <td className="px-4 py-3.5"><p className="text-sm text-slate-100">{a.customerName}</p><p className="text-xs text-slate-500">{a.customerEmail}</p></td>
-                    <td className="px-4 py-3.5 text-sm text-slate-400">{fmtDate(a.date)} at {a.time}</td>
+                    <td className="px-4 py-3.5"><p className="text-sm text-slate-100">{a.name}</p><p className="text-xs text-slate-500">{a.email}</p></td>
+                    <td className="px-4 py-3.5 text-sm text-slate-400">{fmtDate(a.bookedFor)} at {new Date(a.bookedFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                     <td className="px-4 py-3.5"><span className={`text-xs px-2.5 py-1 rounded-full font-medium ${a.status === 'CONFIRMED' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}`}>{a.status}</span></td>
                     <td className="px-4 py-3.5 text-right">{a.status === 'CONFIRMED' && <button onClick={() => handleCancel(a._id)} className="text-xs text-slate-500 hover:text-red-400 transition-colors">Cancel</button>}</td>
                   </tr>
@@ -314,8 +314,8 @@ function AppointmentsTab() {
                   <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${a.status === 'CONFIRMED' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}`}>{a.status}</span>
                 </div>
                 <p className="text-sm text-slate-100 font-medium">{a.serviceName || a.serviceId?.name}</p>
-                <p className="text-xs text-slate-500 mt-1">{a.customerName} • {a.customerEmail}</p>
-                <p className="text-xs text-slate-400 mt-1">{fmtDate(a.date)} at {a.time}</p>
+                <p className="text-xs text-slate-500 mt-1">{a.name} • {a.email}</p>
+                <p className="text-xs text-slate-400 mt-1">{fmtDate(a.bookedFor)} at {new Date(a.bookedFor).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                 {a.status === 'CONFIRMED' && <button onClick={() => handleCancel(a._id)} className="mt-3 w-full py-2 rounded-lg bg-red-500/10 text-red-400 text-sm hover:bg-red-500/20 transition-colors">Cancel</button>}
               </div>
             ))}
