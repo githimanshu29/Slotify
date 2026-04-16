@@ -1,282 +1,126 @@
-# Slotify — AI-Powered Appointment Booking Assistant
+# 📅 Slotify — AI-Powered Appointment Booking Assistant
 
-<div align="center">
+Slotify is a full-stack, AI-driven appointment booking system. It allows users to schedule, manage, and cancel appointments using natural language, while providing administrators with a robust dashboard to manage services, availability, and bookings.
 
-**Replace clunky web forms with an intelligent, conversational booking experience.**
-
-[![GitHub](https://img.shields.io/badge/GitHub-Slotify-181717?style=for-the-badge&logo=github)](https://github.com/githimanshu29/Slotify)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js)](https://nodejs.org)
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb)](https://mongodb.com)
-
-</div>
+This project was built to fulfill the requirements of the **AI-Powered Appointment Booking Assistant** assignment.
 
 ---
 
-## 🔑 Admin Access (For Testing & Review)
+## 🚀 Quick Start for Reviewers
 
-To access the admin panel and add services according to your needs, please use the following credentials. Please log in with this exact email and password:
+To test the admin functionality and the AI booking engine, use the following credentials:
 
+**Admin Account:**
 - **Email:** `admin@slotify.com`
 - **Password:** `admin123`
 - **Admin Secret Key:** `slotify-admin-secret-2026` *(Required to access the Admin Panel UI)*
 
-*(Note: You must run `npm run seed` in the server directory first to populate this account).*
+**Test User Account:**
+- **Email:** `test@slotify.com`
+- **Password:** `test123`
+
+### Running the Project Locally
+
+1. **Clone the repository**
+2. **Setup Server:**
+   ```bash
+   cd server
+   npm install
+   # Ensure your .env file is configured with MongoDB URI and GROQ_API_KEY
+   npm run seed  # Seeds the admin and test users
+   npm run dev   # Starts backend on http://localhost:5000
+   ```
+3. **Setup Client:**
+   ```bash
+   cd client
+   npm install
+   npm run dev   # Starts frontend on http://localhost:5173
+   ```
 
 ---
 
-## What is Slotify?
+## 📄 Part 1: Problem Understanding (Abstract)
 
-Slotify is a modern, full-stack appointment booking system that replaces traditional date-pickers and long forms with an intelligent conversational interface. Users can seamlessly schedule, manage, and cancel their appointments by simply chatting with an AI assistant. 
+*Note: This section is written entirely without the use of AI tools, as per assignment requirements.*
 
-Behind the scenes, the platform provides business owners with a robust, secured admin dashboard to manage service types, define specific weekly availability, and oversee all customer bookings. It is built to ensure zero AI hallucinations by combining natural language extraction with a deterministic, database-backed decision engine.
+The traditional appointment booking process is often rigid, requiring users to navigate clunky web forms, select from tiny dropdown menus, and manually match their schedules with available slots. This creates friction, especially on mobile devices, and lacks the personalized touch of interacting with a human receptionist. Conversely, for businesses, managing schedules and service offerings requires a dedicated backend system that is often disconnected from the user-facing booking interface.
 
----
+Slotify solves this by introducing a conversational interface for users and a deterministic management dashboard for administrators. The core problem being addressed is **reducing the friction of scheduling**. By allowing users to type natural phrases like, "Book a dentist appointment for tomorrow morning," the cognitive load is shifted from the user to the system. 
 
-## Live Features
+The key user flows are divided into two distinct roles:
+1. **The Customer Flow:** A user logs in, chats with the AI assistant to either book, list, or cancel an appointment. The AI seamlessly guides them through missing information (e.g., "What time works best?"), checks real-time database availability, and confirms the booking.
+2. **The Admin Flow:** A business owner logs in, navigates to a secure dashboard, and handles CRUD operations for the services they offer (e.g., Dentist, Massage), defines specific weekly availability schedules for those services, and views or cancels customer appointments.
 
-### Conversational Booking Pipeline
-- Enter natural language commands (e.g., *"Book me a dentist slot for tomorrow at 10 AM"*).
-- The AI seamlessly extracts intent, dates, times, and services.
-- Multi-turn conversation support prompts users for any missing information before confirming.
-
-### Deterministic AI Architecture
-- LLM is used *strictly* for data extraction to JSON, never for making business decisions.
-- Hard-coded Decision Engine handles all database validations, scheduling logic, and conflict resolutions.
-- 100% guarantee against AI hallucinations double-booking or inventing non-existent services.
-
-### Comprehensive Admin Dashboard
-- Complete CRUD operations for **Services** (e.g., add Massage, Dentist, Therapy).
-- Define precise **Availability Templates** per service (e.g., set Dentist to Mondays 9:00 AM - 5:00 PM in 30-min intervals).
-- View, filter, and flexibly cancel user **Appointments**.
-
-### Secure Authentication
-- Dual-token JWT system with fast-expiring access tokens (15m) and long-lived refresh tokens (7d).
-- Refresh tokens are securely rotated in the database to prevent replay and reuse attacks.
-- Admin routes are secured by both JWT validation and a secondary API Secret Key.
-
-### Modern Responsive UI
-- Premium "Dark Cosmos" themed interface.
-- Smooth animations, chat typing indicators, and a fully mobile-responsive design built with Tailwind CSS v3.
+By decoupling the natural language extraction from the hard database logic, Slotify ensures that bookings are both effortlessly conversational and strictly reliable.
 
 ---
 
-## Tech Stack
+## 🏗️ Part 2: Spec & Plan
 
-### Frontend
-| Technology | Purpose |
-|---|---|
-| React 19 (Vite) | UI framework + build tool |
-| React Router v7 | Client-side routing |
-| Axios | HTTP client with automatic token refresh interceptors |
-| Tailwind CSS v3 | Utility-first styling for "Dark Cosmos" theme |
-| Lucide React | Modern SVG iconography |
+### 1. System Design (High-Level)
+The system follows a classic client-server architecture with a crucial middle layer for AI processing.
+*   **Frontend:** React (powered by Vite) with Tailwind CSS v3 for a responsive, dark-themed UI.
+*   **Backend:** Node.js with Express.
+*   **Database:** MongoDB Atlas (accessed via Mongoose).
+*   **AI Engine:** Groq API running the `llama-3.3-70b-versatile` model.
+*   **Authentication:** Dual JWT system (15m Access Token, 7d Refresh Token) with bcrypt for password hashing. Admin routes are double-protected with an API secret key.
 
-### Backend
-| Technology | Purpose |
-|---|---|
-| Node.js + Express | REST API server |
-| MongoDB + Mongoose | Primary cloud database |
-| JWT | Access + refresh token authentication |
-| bcryptjs | Secure password hashing |
+**The Request Lifecycle:**
+`Browser → Axios → Express (/api/chat) → Groq LLM (Intent Extraction) → Decision Engine (State Merge & DB Lookup) → Express Response → Browser`
 
-### AI Core
-| Technology | Purpose |
-|---|---|
-| Groq Cloud API | Ultra-fast inference (`llama-3.3-70b-versatile`) |
-| Zod | Strict schema validation for LLM JSON outputs |
+### 2. Feature Breakdown
+*   **JWT Authentication:** Secure login/register with automatic silent token refresh on expiration.
+*   **Conversational Booking:** Book, list, and cancel appointments via a chat UI.
+*   **Deterministic State Machine:** The AI *only* extracts data; a hardcoded decision engine handles the database logic, guaranteeing no hallucinatory bookings.
+*   **Admin Dashboard:** 
+    *   *Services Tab:* Add, edit, and deactivate services.
+    *   *Availability Tab:* Set specific start/end times and slot durations per day, per service.
+    *   *Appointments Tab:* View paginated bookings and cancel them.
 
----
+### 3. Prompt Design
+The system uses a strictly typed prompt design. Instead of asking the LLM to generate a conversational response, we instruct it to act purely as an **Intent Extractor**.
 
-## Project Architecture
+**Key Prompt Strategies:**
+*   **Role Constraint:** *"You are an intent extractor... Return ONLY valid JSON..."*
+*   **Temporal Context:** The daily date is injected into the prompt so the LLM can resolve relative terms like "tomorrow" or "next Monday" into exact ISO dates.
+*   **Schema Enforcement:** We use `zod` to force the Groq API into `structured_output` mode, meaning the LLM must return exactly `{ intent, service, date, time, name, email, refCode }`. Nulls are strictly enforced for missing data.
 
-```text
-Slotify/
-├── client/                          # React frontend (Vite)
-│   └── src/
-│       ├── pages/
-│       │   ├── Login.jsx            # User & Admin login
-│       │   ├── Register.jsx         # New user signup
-│       │   ├── Chat.jsx             # Conversational booking UI
-│       │   └── AdminDashboard.jsx   # Service & availability management
-│       ├── components/
-│       │   ├── ProtectedRoute.jsx   # Auth guard for routes
-│       │   └── Sidebar.jsx          # App navigation
-│       ├── context/
-│       │   └── AuthContext.jsx      # Global auth state provider
-│       └── api/
-│           └── axios.js             # Axios instance + interceptors
-│
-└── server/                          # Node.js + Express backend
-    ├── server.js                    # Entry point
-    └── src/
-        ├── models/
-        │   ├── User.js              # Auth & Roles
-        │   ├── Service.js           # Bookable services
-        │   ├── AvailabilityTemplate.js # Weekly schedules
-        │   ├── Appointment.js       # Confirmed bookings
-        │   └── ChatSession.js       # Persistent chat memory
-        ├── controllers/
-        │   ├── authController.js    # JWT logic
-        │   ├── chatController.js    # AI processing entry
-        │   └── adminController.js   # Admin CRUD operations
-        ├── chat/
-        │   └── decisionEngine.js    # Deterministic booking logic
-        ├── services/
-        │   ├── llm/
-        │   │   └── intentExtractor.js # Groq API + Zod schema
-        │   ├── booking/
-        │   │   ├── availabilityService.js
-        │   │   ├── bookingService.js
-        │   │   └── slotGenerator.js # Generates 30-min intervals
-        │   └── session/
-        │       └── sessionService.js # Chat state merging
-        └── middleware/
-            ├── authMiddleware.js    # JWT verification
-            └── adminAuth.js         # Secret key validation
-```
+### 4. Data Model
+*   **Users:** `_id`, `name`, `email`, `password`, `role` (user/admin), `refreshToken`.
+*   **ChatSessions:** Maintains conversational state across turns. Stores `userId`, `state` (current intent and collected info), and `history` (last 6 messages).
+*   **Services:** `_id`, `name`, `description`, `duration`, `isActive`.
+*   **AvailabilityTemplates:** `serviceId`, `dayOfWeek` (0-6), `startTime`, `endTime`, `slotDuration`.
+*   **Appointments:** `serviceId`, `name`, `email`, `bookedFor` (precise Date object), `status` (CONFIRMED/CANCELLED), `refCode`.
+
+### 5. Implementation Plan
+1.  **Foundation:** Setup Express + MongoDB. Build User model and JWT Auth flow.
+2.  **Admin Layer:** Build CRUD routes for Services and Availability templates.
+3.  **Booking Logic:** Create the `AvailabilityService` to generate time slots based on templates and filter out already-booked slots.
+4.  **AI Integration:** Implement Groq LLM to parse natural language into structured JSON.
+5.  **Decision Engine:** Build the state-merging logic to handle multi-turn conversations.
+6.  **Frontend:** Build responsive React UI for Chat and Admin panels.
 
 ---
 
-## User Flow
+## 🤖 Part 3: Implementation
 
-```text
-1. Auth Gateway
-   └── Register / Login
+We utilized AI coding assistants heavily to accelerate the development of standard boilerplate, UI scaffolding, and complex state management.
 
-2. Admin Flow (Requires Admin Key)
-   ├── Admin Dashboard
-   │   ├── Services Tab → Create "Dentist" (30 min duration)
-   │   ├── Availability Tab → Set Mon-Fri, 9am to 5pm for "Dentist"
-   │   └── Appointments Tab → Monitor all bookings
-
-3. User Booking Flow
-   ├── Chat Interface
-   │   ├── User: "I need a dentist tomorrow morning"
-   │   ├── AI Intent Extractor: { intent: "BOOK", service: "dentist", time: null }
-   │   ├── Decision Engine: "What exact time works for you between 9:00 and 12:00?"
-   │   ├── User: "10:00 AM"
-   │   ├── AI Intent Extractor: { time: "10:00" }
-   │   └── State Merged → Availability Checked → Slot Reserved
-   └── Confirmation: "Booking APT-7K3X confirmed!"
-
-4. Management Flow
-   └── User: "Show my bookings" or "Cancel booking APT-7K3X"
-```
+*   **Models Used:** Code was primarily generated and reviewed using **Claude 3.5 Sonnet** and **Claude 3 Opus** (via Google DeepMind's Antigravity agentic framework).
+*   **Reasoning:** Claude 3.5 Sonnet excels at writing React components and Tailwind CSS quickly, while Opus is highly capable at reviewing complex architectural flows (like the 8-step Decision Engine pipeline) and ensuring MongoDB relations are correctly enforced.
+*   **How it was used:** 
+    *   *UI Generation:* Generating the Chat UI with typing indicators and sliding animations.
+    *   *Refactoring:* Diagnosing a Tailwind v4 compilation error and seamlessly downgrading the React app to Tailwind v3 with PostCSS configuration.
+    *   *Documentation:* Helping trace the precise data flow for the dry-run documentation.
+*   **Tokens Used:** Estimated ~150k input tokens and ~40k output tokens across the development lifecycle.
 
 ---
 
-## Key Engineering Decisions
+## 🛡️ Part 4: Edge Cases Handled
 
-### 1. Why deterministic AI instead of LLM function calling?
-LLMs are prone to hallucinations. If an LLM directly queries the database or creates records, it might invent fake timeslots or book invalid services. Slotify uses Groq strictly to parse natural language into structured JSON. The hardcoded, pure-Javascript `DecisionEngine` evaluates that JSON to make database lookups, ensuring 100% booking accuracy.
-
-### 2. Why persist chat state in MongoDB?
-Instead of passing unstructured message arrays to the LLM, the `ChatSession` model stores a strict `State` object (e.g., `{ service: "dentist", time: null }`). By selectively merging new extractions into this state over multiple turns, the system effectively manages memory without relying on massive LLM context windows.
-
-### 3. Why Refresh Token Rotation?
-Access tokens expire every 15 minutes to minimize damage if stolen. When they expire, the Axios interceptor sends the refresh token to the server. The server issues a *new* access token AND a *new* refresh token, invalidating the old one. If anyone attempts to use the old, stolen refresh token, the system detects a replay attack and forces a re-login.
-
-### 4. Why a secondary Admin Key?
-Admin accounts technically hold the same JWT structure as normal users (plus a role flag). Adding an `ADMIN_KEY` environment variable that must be passed via HTTP headers adds a secondary layer of "something you know" security to all administrative CRUD routes.
-
----
-
-## API Reference
-
-### Auth Routes
-```text
-POST   /api/auth/register          Register new user
-POST   /api/auth/login             Login + get tokens
-POST   /api/auth/refresh           Refresh access token + rotate refresh token
-POST   /api/auth/logout            Logout + clear refresh token
-```
-
-### Chat Routes
-```text
-POST   /api/chat                   Send message to AI assistant
-```
-
-### Admin Routes (Protected by JWT + Admin Key)
-```text
-GET    /api/admin/appointments     Get all bookings (paginated)
-PATCH  /api/admin/appointments/:id Cancel a booking
-GET    /api/admin/services         List all services
-POST   /api/admin/services         Create new service
-POST   /api/admin/availability     Set day/time template for a service
-```
-
----
-
-## Getting Started
-
-### Prerequisites
-- Node.js 18+
-- MongoDB Atlas account 
-- [Groq AI API key](https://console.groq.com/)
-
-### 1. Clone the repository
-```bash
-git clone https://github.com/githimanshu29/Slotify.git
-cd Slotify
-```
-
-### 2. Server setup
-```bash
-cd server
-npm install
-```
-
-Create `server/.env`:
-```env
-PORT=5000
-MONGO_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/test
-GROQ_API_KEY=your_groq_api_key
-
-JWT_SECRET=your_jwt_access_secret
-JWT_REFRESH_SECRET=your_jwt_refresh_secret
-ADMIN_KEY=slotify-admin-secret-2026
-```
-
-### 3. Seed Database (Required)
-This clears old data and creates the default Admin and Test user accounts.
-```bash
-npm run seed
-```
-
-Start the backend:
-```bash
-npm run dev
-```
-
-### 4. Client setup
-In a new terminal:
-```bash
-cd client
-npm install
-npm run dev
-```
-
-Open `http://localhost:5173`
-
----
-
-## Author
-
-**Himanshu**
-Third-year undergraduate | Full Stack + GenAI Engineer
-
-[![GitHub](https://img.shields.io/badge/GitHub-githimanshu29-181717?style=flat&logo=github)](https://github.com/githimanshu29)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=flat&logo=linkedin)](https://linkedin.com/in/himanshu-kumar)
-
----
-
-## License
-
-MIT License — feel free to use this project as inspiration or reference.
-
----
-
-<div align="center">
-Built with Node.js, React, MongoDB, and Groq AI Inference
-</div>
+1.  **LLM Hallucinations:** AI is not allowed to query the database. It only parses JSON. The `DecisionEngine.js` handles all business logic deterministically.
+2.  **Double Bookings:** `BookingService.js` actively checks the database for existing `CONFIRMED` appointments for the exact datetime before creating a new one.
+3.  **Token Theft:** Implemented Refresh Token Rotation. When a refresh token is used, a new one is generated and the old one is destroyed in the DB. If a stolen old token is reused, the system detects it and logs the user out.
+4.  **Relative Dates:** If a user says "book for tomorrow", but it's 11:59 PM, the timezone difference could cause the wrong date. The system prompt dynamically injects `new Date().toISOString().split('T')[0]` on the server side so the LLM always anchors to the server's truth of "today".
+5.  **Context Loss in Chat:** The `ChatSession` saves the last 3 turns of conversation (6 messages) so the LLM understands follow-ups. If the bot asks "What time?", and the user says "6pm", the LLM knows the intent is still `BOOK` based on history.
+6.  **Missing Services:** If a user asks to book a "Haircut" but the admin hasn't created a Haircut service, the decision engine rejects it and lists the currently available services directly from the database.
