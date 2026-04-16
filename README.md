@@ -2,6 +2,11 @@
 
 Slotify is a modern, full-stack appointment booking system that replaces clunky web forms with an intelligent conversational interface. Users can seamlessly schedule, manage, and cancel their appointments by simply chatting with an AI assistant. It also features a complete, secure admin dashboard for business owners to manage services and availability.
 
+## To access admin panel to add services according to admin pls use following credentials:
+- **Email:** `admin@slotify.com` (pls login with this exact email and password)
+- **Password:** `admin123`
+- **Admin Secret Key:** `slotify-admin-secret-2026` (this key needed to acces admin panel)
+
 ![Slotify Demo](https://img.shields.io/badge/Status-Completed-success) ![Tech](https://img.shields.io/badge/Stack-MERN-blue)
 
 ## ✨ Features
