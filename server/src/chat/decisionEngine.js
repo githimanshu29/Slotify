@@ -16,6 +16,20 @@ export async function handleIntent(state) {
   logger.debug('Decision engine processing', { intent, collectedInfo: f });
 
   // ──────────────────────────────────────────────────
+  //  RESET — stop current conversation/booking
+  // ──────────────────────────────────────────────────
+  if (intent === 'RESET') {
+    return {
+      reply: "Alright, I've stopped the current booking process. We can start fresh! What would you like to do?",
+      state: {
+        intent: null,
+        collectedInfo: { service: null, serviceId: null, date: null, time: null, name: null, email: null, refCode: null },
+        selectedSlot: null,
+      },
+    };
+  }
+
+  // ──────────────────────────────────────────────────
   //  CHITCHAT — friendly response, no DB interaction
   // ──────────────────────────────────────────────────
   if (intent === 'CHITCHAT' || !intent) {
@@ -98,14 +112,14 @@ export async function handleIntent(state) {
 
     if (!f.date) {
       return {
-        reply: 'Which date works for you? (e.g., tomorrow, next Monday, 2026-04-20)',
+        reply: 'Which date works for you? (e.g., tomorrow, next Monday, 2026-04-20, please Provide Date and Day both if possible)',
         state,
       };
     }
 
     if (!f.time) {
       return {
-        reply: 'What time would you prefer? (e.g., 10am, 2:30pm, evening)',
+        reply: 'What time would you prefer? (e.g., 10am, 2:30pm, evening, if possible provide time in 24 hour format)',
         state,
       };
     }

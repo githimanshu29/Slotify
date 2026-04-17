@@ -9,7 +9,7 @@ import logger from '../../utils/Logger.js';
 // If it returns anything else, Zod throws and we fallback
 const IntentSchema = z.object({
   intent: z
-    .enum(['BOOK', 'LIST', 'CANCEL', 'CONFIRM', 'CHITCHAT'])
+    .enum(['BOOK', 'LIST', 'CANCEL', 'CONFIRM', 'CHITCHAT', 'RESET'])
     .describe('The user intent'),
   service: z
     .string()
@@ -52,6 +52,7 @@ INTENTS:
 - CANCEL → user wants to cancel an appointment
 - CONFIRM → user is saying yes/confirm to a pending action
 - CHITCHAT → greeting, thanks, off-topic, or unclear
+- RESET → user wants to stop, abort, or start over the current booking process
 
 RULES:
 1. Extract ONLY fields explicitly mentioned by the user
@@ -73,7 +74,7 @@ RULES:
 9. Reference codes look like APT-XXXX — extract as refCode
 
 OUTPUT SCHEMA:
-{ "intent": "BOOK|LIST|CANCEL|CONFIRM|CHITCHAT", "service": string|null, "date": "YYYY-MM-DD"|null, "time": "HH:MM"|null, "name": string|null, "email": string|null, "refCode": string|null }`;
+{ "intent": "BOOK|LIST|CANCEL|CONFIRM|CHITCHAT|RESET", "service": string|null, "date": "YYYY-MM-DD"|null, "time": "HH:MM"|null, "name": string|null, "email": string|null, "refCode": string|null }`;
 }
 
 /**

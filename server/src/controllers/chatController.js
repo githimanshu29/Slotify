@@ -4,6 +4,7 @@ import { extractIntent } from '../services/llm/intentExtractor.js';
 import { loadSession, saveSession, mergeState } from '../services/session/sessionService.js';
 import { handleIntent } from '../chat/decisionEngine.js';
 import { sendSuccess, sendError } from '../utils/responseUtils.js';
+import Service from '../models/Service.js';
 import logger from '../utils/Logger.js';
 
 /**
@@ -61,5 +62,19 @@ export async function handleMessage(req, res) {
   } catch (error) {
     logger.error('Chat controller error', { error: error.message, stack: error.stack });
     return sendError(res, 'Something went wrong. Please try again.', 500);
+  }
+}
+
+/**
+ * Fetch available services for the user UI
+ * GET /api/chat/services
+ */
+export async function getAvailableServices(req, res) {
+  try {
+    const services = await Service.find({ isActive: true }).select('name duration description price').sort({ name: 1 });
+    return sendSuccess(res, services);
+  } catch (error) {
+    logger.error('Error fetching available services', { error: error.message });
+    return sendError(res, 'Failed to list services', 500);
   }
 }

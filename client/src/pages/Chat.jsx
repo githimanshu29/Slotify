@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import API from '../api/axios';
 import {
   Send, Calendar, LogOut, MessageSquare, Bot, User, Sparkles,
-  ClipboardList, X as XIcon, Menu, LayoutDashboard,
+  ClipboardList, X as XIcon, Menu, LayoutDashboard, RefreshCcw,
 } from 'lucide-react';
 
 function TypingIndicator() {
@@ -38,16 +38,14 @@ function ChatMessage({ message }) {
 
   return (
     <div className={`flex items-end gap-3 ${isUser ? 'flex-row-reverse animate-slide-right' : 'animate-slide-left'}`}>
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-        isUser ? 'bg-gradient-to-br from-purple-500 to-violet-600' : 'bg-gradient-to-br from-violet-600 to-cyan-500'
-      }`}>
+      <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isUser ? 'bg-gradient-to-br from-purple-500 to-violet-600' : 'bg-gradient-to-br from-violet-600 to-cyan-500'
+        }`}>
         {isUser ? <User className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-white" />}
       </div>
-      <div className={`max-w-[80%] sm:max-w-[70%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
-        isUser
-          ? 'bg-gradient-to-r from-violet-600 to-purple-500 text-white rounded-br-md'
-          : 'bg-gray-800/60 border border-slate-700/50 text-slate-300 rounded-bl-md'
-      }`}>
+      <div className={`max-w-[80%] sm:max-w-[70%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${isUser
+        ? 'bg-gradient-to-r from-violet-600 to-purple-500 text-white rounded-br-md'
+        : 'bg-gray-800/60 border border-slate-700/50 text-slate-300 rounded-bl-md'
+        }`}>
         {isUser ? message.content : renderText(message.content)}
       </div>
     </div>
@@ -62,6 +60,7 @@ const quickActions = [
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
+  const [services, setServices] = useState([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -77,6 +76,18 @@ export default function Chat() {
       role: 'assistant',
       content: "Hey there! 👋 I'm your Slotify booking assistant.\n\nI can help you:\n• **Book** an appointment\n• **List** your existing bookings\n• **Cancel** a booking\n\nJust tell me what you need!",
     }]);
+
+    const fetchServices = async () => {
+      try {
+        const { data } = await API.get('/chat/services');
+        if (data.success) {
+          setServices(data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch services', err);
+      }
+    };
+    fetchServices();
   }, []);
 
   const sendMessage = async (text) => {
@@ -101,9 +112,8 @@ export default function Chat() {
       {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-gray-900 border-r border-slate-700/50 flex flex-col transition-transform duration-300 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      }`}>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-gray-900 border-r border-slate-700/50 flex flex-col transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}>
         <div className="p-6 border-b border-slate-700/50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-purple-500 rounded-xl flex items-center justify-center shadow-md shadow-violet-600/20">
@@ -127,6 +137,26 @@ export default function Chat() {
               <span className="text-sm font-medium">Admin Panel</span>
             </Link>
           )}
+
+          <div className="pt-6 pb-2">
+            <h3 className="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Available Services</h3>
+            <div className="space-y-1">
+              {services.length === 0 ? (
+                <p className="px-4 text-xs text-slate-600 italic">No services listed yet.</p>
+              ) : (
+                services.map(s => (
+                  <button key={s._id}
+                    className="w-full text-left px-4 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-gray-800/60 transition-colors flex justify-between items-center group">
+                    <div>
+                      <div className="text-sm font-medium">{s.name}</div>
+                      <div className="text-xs text-slate-500">{s.duration} mins {s.price ? `• $${s.price}` : ''}</div>
+                    </div>
+                    <span className="text-xs text-violet-400 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
         </nav>
 
         <div className="p-4 border-t border-slate-700/50">
@@ -184,12 +214,17 @@ export default function Chat() {
 
         <div className="p-4 sm:p-6 pt-2 sm:pt-2 border-t border-slate-700/50 bg-gray-900/30">
           <div className="flex items-end gap-3 max-w-4xl mx-auto">
+            <button onClick={() => sendMessage('🛑 Stop current booking')} disabled={isTyping} type="button" title="Stop & Start Fresh"
+              className="p-3.5 rounded-xl bg-gray-800/60 border border-slate-700/50 text-red-400 hover:text-white hover:bg-red-500 hover:border-red-500 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shrink-0 flex items-center justify-center">
+              <RefreshCcw className="w-5 h-5" />
+              Start Fresh
+            </button>
             <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown}
               placeholder="Type your message..." rows={1}
               className="flex-1 px-4 py-3.5 rounded-xl bg-gray-800/60 border border-slate-700/50 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 transition-all duration-200 resize-none text-sm"
               style={{ maxHeight: '120px' }} />
             <button onClick={() => sendMessage()} disabled={!input.trim() || isTyping}
-              className="p-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-500 text-white hover:shadow-lg hover:shadow-violet-600/25 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 shrink-0">
+              className="p-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-500 text-white hover:shadow-lg hover:shadow-violet-600/25 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 shrink-0 flex items-center justify-center">
               <Send className="w-5 h-5" />
             </button>
           </div>
