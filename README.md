@@ -21,7 +21,7 @@ To review the admin dashboard and see how the database is populated, please log 
 
 ---
 
-## Part 1 — Problem Understanding (NO AI)
+## Part 1 — Problem Understanding 
 
 ### Abstract
 Booking an appointment today — whether with a dentist, a physiotherapist, or a massage therapist — requires navigating through clunky website forms and dropdown menus: pick a date, pick a time, pick a service, fill in contact details, submit. This process is complex for the user and fragile for the business, because it gives no guidance when a slot is taken and requires the user to already know exactly what they want before they even start.
