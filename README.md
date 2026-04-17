@@ -1,4 +1,4 @@
-# SLOTIFY — AI-Powered Appointment Booking Assistant
+# SLOTIFY — AI-Powered Appointment Booking Assistant.
 
 **Assignment Report — Full Stack + GenAI Engineering**
 
